@@ -22,7 +22,6 @@
     .btn{flex:1;padding:8px 10px;border-radius:8px;border:0;background:linear-gradient(90deg,var(--accent),#0ea5a6);color:#042027;font-weight:600;cursor:pointer}
     .btn.ghost{background:transparent;color:var(--muted);border:1px solid rgba(255,255,255,0.05)}
 
-    /* product modal */
     .modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(2,6,23,0.6)}
     .modal.open{display:flex}
     .modal-card{width:100%;max-width:880px;background:#071928;padding:18px;border-radius:12px}
@@ -43,9 +42,7 @@
       <h1>Components Store</h1>
       <p class="small">Static store. Click a product and order via WhatsApp.</p>
     </div>
-    <div id="contact">
-      <!-- WhatsApp number shown here -->
-    </div>
+    <div id="contact"></div>
   </header>
 
   <main>
@@ -58,7 +55,6 @@
   </footer>
 </div>
 
-<!-- modal -->
 <div id="modal" class="modal" role="dialog" aria-hidden="true">
   <div class="modal-card">
     <div class="modal-head">
@@ -77,41 +73,17 @@
 </div>
 
 <script>
-// ===== CONFIG - edit these values =====
-// Put your WhatsApp number in international format without + or leading zeros (e.g. 92300xxxxxxx for Pakistan)
 const WHATSAPP_NUMBER = '923001234567';
-// Put your GitHub repo raw base URL (where products.json and images live). Example:
-// https://raw.githubusercontent.com/USERNAME/REPO/main/
-const GITHUB_RAW_BASE = 'https://raw.githubusercontent.com/your-username/your-repo/main/';
-
-// Optional: if you already uploaded products.json to the repo, set this to true to fetch it.
 const FETCH_FROM_GITHUB = false;
-// ======================================
 
 const grid = document.getElementById('grid');
 const contact = document.getElementById('contact');
-const ghRepo = document.getElementById('gh-repo');
 
-// Sample products: update locally or upload a products.json to your repo and flip FETCH_FROM_GITHUB to true
 const sampleProducts = [
-  {id:1,name:'Arduino UNO R3',price:'₹750',image:'images/arduino_uno.jpg',desc:'Atmega328P based development board.'},
-  {id:2,name:'DHT22 Temperature Sensor',price:'₹400',image:'images/dht22.jpg',desc:'Temperature & humidity sensor.'},
-  {id:3,name:'Relay Module 5V',price:'₹120',image:'images/relay.jpg',desc:'Single channel relay module for switching.'}
+  {id:1,name:'Arduino UNO R3',price:'₹750',image:'arduino.png',desc:'Atmega328P based development board.'},
+  {id:2,name:'DHT22 Temperature Sensor',price:'₹400',image:'dht22.png',desc:'Temperature & humidity sensor.'},
+  {id:3,name:'Relay Module 5V',price:'₹120',image:'relay.png',desc:'Single channel relay module for switching.'}
 ];
-
-async function loadProducts(){
-  let products = sampleProducts;
-  if(FETCH_FROM_GITHUB){
-    try{
-      const res = await fetch(GITHUB_RAW_BASE + 'products.json');
-      if(res.ok) products = await res.json();
-      else console.warn('Could not load products.json from GitHub raw URL');
-      ghRepo.textContent = 'Repo: ' + GITHUB_RAW_BASE.replace('https://raw.githubusercontent.com/','');
-    }catch(e){console.warn('Failed to fetch products.json',e)}
-  }
-
-  renderProducts(products);
-}
 
 function renderProducts(products){
   grid.innerHTML = '';
@@ -120,8 +92,7 @@ function renderProducts(products){
     const thumb = document.createElement('div');thumb.className='thumb';
     const img = document.createElement('img');
     img.alt = p.name;
-    // If using GitHub raw base, prefer that; else assume relative path inside site
-    img.src = (FETCH_FROM_GITHUB ? (GITHUB_RAW_BASE + p.image) : p.image);
+    img.src = p.image;
     thumb.appendChild(img);
 
     const title = document.createElement('div');title.className='title';title.textContent = p.name;
@@ -140,7 +111,6 @@ function renderProducts(products){
   })
 }
 
-// Modal logic
 const modal = document.getElementById('modal');
 const modalThumb = document.getElementById('modal-thumb').querySelector('img');
 const modalTitle = document.getElementById('modal-title');
@@ -150,7 +120,7 @@ const closeBtn = document.getElementById('close-btn');
 
 function openModal(p){
   modal.classList.add('open');
-  modalThumb.src = (FETCH_FROM_GITHUB ? (GITHUB_RAW_BASE + p.image) : p.image);
+  modalThumb.src = p.image;
   modalTitle.textContent = p.name + (p.price ? (' — ' + p.price) : '');
   modalDesc.textContent = p.desc || '';
   waBtn.onclick = ()=> openWhatsapp(p);
@@ -165,34 +135,13 @@ function openWhatsapp(p){
   window.open(url, '_blank');
 }
 
-// show contact
 function formatPhoneForDisplay(num){
   if(!num) return '';
-  // naive formatting: +country rest
   return '+' + num;
 }
 contact.innerHTML = `<div style="text-align:right">WhatsApp: <strong>${formatPhoneForDisplay(WHATSAPP_NUMBER)}</strong></div>`;
 
-// initial load
-loadProducts();
+renderProducts(sampleProducts);
 </script>
-
-<!--
-  README / Instructions (quick):
-  1) Create a GitHub repo and upload this index.html in the root.
-  2) Add an images/ folder and upload your component images there. Use the same filenames shown in products.json.
-  3) (Optional) Create products.json in the repo and set FETCH_FROM_GITHUB = true and update GITHUB_RAW_BASE to your raw URL (e.g. https://raw.githubusercontent.com/username/repo/main/)
-     Example products.json structure:
-     [
-       {"id":1, "name":"Arduino UNO R3", "price":"₹750", "image":"images/arduino_uno.jpg", "desc":"Atmega328P board"},
-       ...
-     ]
-  4) To host: go to repo Settings -> Pages and pick branch main (or gh-pages). Or use GitHub Desktop / CLI to push. Your site will be available at https://username.github.io/repo/
-  5) When users click "Order via WhatsApp" the site opens WhatsApp with a prefilled message to your number.
-
-  Need help customizing this (logo, payment links, categories, search, cart)? Tell me what features you want and I'll update the code.
--->
-
 </body>
 </html>
-
