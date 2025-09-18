@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Simple Components Store</title>
+  <style>
+    :root{--bg:#0f172a;--card:#0b1220;--muted:#94a3b8;--accent:#06b6d4}
+    html,body{height:100%;margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial; background:linear-gradient(180deg,#071029 0%, #071b2b 100%);color:#e6eef6}
+    .container{max-width:1100px;margin:32px auto;padding:20px}
+    header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+    h1{font-size:20px;margin:0}
+    p.small{color:var(--muted);margin:4px 0 0}
+
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px}
+    .card{background:rgba(255,255,255,0.02);border-radius:12px;padding:12px;box-shadow:0 6px 18px rgba(2,6,23,0.6);display:flex;flex-direction:column;gap:10px}
+    .thumb{height:150px;border-radius:8px;background:#071424;display:flex;align-items:center;justify-content:center;overflow:hidden}
+    .thumb img{max-width:100%;max-height:100%;object-fit:contain}
+    .title{font-weight:600}
+    .meta{color:var(--muted);font-size:13px}
+    .actions{margin-top:auto;display:flex;gap:8px}
+    .btn{flex:1;padding:8px 10px;border-radius:8px;border:0;background:linear-gradient(90deg,var(--accent),#0ea5a6);color:#042027;font-weight:600;cursor:pointer}
+    .btn.ghost{background:transparent;color:var(--muted);border:1px solid rgba(255,255,255,0.05)}
+
+    /* product modal */
+    .modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(2,6,23,0.6)}
+    .modal.open{display:flex}
+    .modal-card{width:100%;max-width:880px;background:#071928;padding:18px;border-radius:12px}
+    .modal-head{display:flex;gap:12px}
+    .modal-body{display:flex;gap:18px;margin-top:12px}
+    .modal .thumb{height:220px;flex:0 0 320px}
+    .modal .info{flex:1}
+
+    footer{margin-top:24px;color:var(--muted);font-size:13px;display:flex;justify-content:space-between;align-items:center}
+
+    @media (max-width:640px){.modal-body{flex-direction:column}.modal .thumb{width:100%;flex:none}}
+  </style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <div>
+      <h1>Components Store</h1>
+      <p class="small">Static store. Click a product and order via WhatsApp.</p>
+    </div>
+    <div id="contact">
+      <!-- WhatsApp number shown here -->
+    </div>
+  </header>
+
+  <main>
+    <div id="grid" class="grid"></div>
+  </main>
+
+  <footer>
+    <div>Made with ❤️ — Host on GitHub Pages</div>
+    <div id="gh-repo" class="small"></div>
+  </footer>
+</div>
+
+<!-- modal -->
+<div id="modal" class="modal" role="dialog" aria-hidden="true">
+  <div class="modal-card">
+    <div class="modal-head">
+      <div class="thumb" id="modal-thumb"><img src="" alt=""></div>
+      <div class="info">
+        <h2 id="modal-title"></h2>
+        <div class="meta" id="modal-desc"></div>
+        <div style="margin-top:10px" id="modal-extra"></div>
+        <div class="actions" style="margin-top:16px">
+          <button id="wa-btn" class="btn">Order via WhatsApp</button>
+          <button id="close-btn" class="btn ghost">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== CONFIG - edit these values =====
+// Put your WhatsApp number in international format without + or leading zeros (e.g. 92300xxxxxxx for Pakistan)
+const WHATSAPP_NUMBER = '923001234567';
+// Put your GitHub repo raw base URL (where products.json and images live). Example:
+// https://raw.githubusercontent.com/USERNAME/REPO/main/
+const GITHUB_RAW_BASE = 'https://raw.githubusercontent.com/your-username/your-repo/main/';
+
+// Optional: if you already uploaded products.json to the repo, set this to true to fetch it.
+const FETCH_FROM_GITHUB = false;
+// ======================================
+
+const grid = document.getElementById('grid');
+const contact = document.getElementById('contact');
+const ghRepo = document.getElementById('gh-repo');
+
+// Sample products: update locally or upload a products.json to your repo and flip FETCH_FROM_GITHUB to true
+const sampleProducts = [
+  {id:1,name:'Arduino UNO R3',price:'₹750',image:'images/arduino_uno.jpg',desc:'Atmega328P based development board.'},
+  {id:2,name:'DHT22 Temperature Sensor',price:'₹400',image:'images/dht22.jpg',desc:'Temperature & humidity sensor.'},
+  {id:3,name:'Relay Module 5V',price:'₹120',image:'images/relay.jpg',desc:'Single channel relay module for switching.'}
+];
+
+async function loadProducts(){
+  let products = sampleProducts;
+  if(FETCH_FROM_GITHUB){
+    try{
+      const res = await fetch(GITHUB_RAW_BASE + 'products.json');
+      if(res.ok) products = await res.json();
+      else console.warn('Could not load products.json from GitHub raw URL');
+      ghRepo.textContent = 'Repo: ' + GITHUB_RAW_BASE.replace('https://raw.githubusercontent.com/','');
+    }catch(e){console.warn('Failed to fetch products.json',e)}
+  }
+
+  renderProducts(products);
+}
+
+function renderProducts(products){
+  grid.innerHTML = '';
+  products.forEach(p=>{
+    const card = document.createElement('div');card.className='card';
+    const thumb = document.createElement('div');thumb.className='thumb';
+    const img = document.createElement('img');
+    img.alt = p.name;
+    // If using GitHub raw base, prefer that; else assume relative path inside site
+    img.src = (FETCH_FROM_GITHUB ? (GITHUB_RAW_BASE + p.image) : p.image);
+    thumb.appendChild(img);
+
+    const title = document.createElement('div');title.className='title';title.textContent = p.name;
+    const meta = document.createElement('div');meta.className='meta';meta.textContent = p.price || '';
+    const desc = document.createElement('div');desc.className='meta';desc.textContent = p.desc || '';
+
+    const actions = document.createElement('div');actions.className='actions';
+    const buyBtn = document.createElement('button');buyBtn.className='btn';buyBtn.textContent='Order via WhatsApp';
+    buyBtn.onclick = ()=> openModal(p);
+    const viewBtn = document.createElement('button');viewBtn.className='btn ghost';viewBtn.textContent='View';
+    viewBtn.onclick = ()=> openModal(p);
+    actions.appendChild(buyBtn);actions.appendChild(viewBtn);
+
+    card.appendChild(thumb);card.appendChild(title);card.appendChild(meta);card.appendChild(desc);card.appendChild(actions);
+    grid.appendChild(card);
+  })
+}
+
+// Modal logic
+const modal = document.getElementById('modal');
+const modalThumb = document.getElementById('modal-thumb').querySelector('img');
+const modalTitle = document.getElementById('modal-title');
+const modalDesc = document.getElementById('modal-desc');
+const waBtn = document.getElementById('wa-btn');
+const closeBtn = document.getElementById('close-btn');
+
+function openModal(p){
+  modal.classList.add('open');
+  modalThumb.src = (FETCH_FROM_GITHUB ? (GITHUB_RAW_BASE + p.image) : p.image);
+  modalTitle.textContent = p.name + (p.price ? (' — ' + p.price) : '');
+  modalDesc.textContent = p.desc || '';
+  waBtn.onclick = ()=> openWhatsapp(p);
+}
+closeBtn.onclick = ()=> modal.classList.remove('open');
+modal.addEventListener('click', (e)=>{ if(e.target===modal) modal.classList.remove('open') });
+
+function openWhatsapp(p){
+  const msg = `Hello, I want to order: ${p.name}${p.price ? (' priced at ' + p.price) : ''}. (Product ID: ${p.id})`;
+  const phone = WHATSAPP_NUMBER.replace(/\D/g,'');
+  const url = `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`;
+  window.open(url, '_blank');
+}
+
+// show contact
+function formatPhoneForDisplay(num){
+  if(!num) return '';
+  // naive formatting: +country rest
+  return '+' + num;
+}
+contact.innerHTML = `<div style="text-align:right">WhatsApp: <strong>${formatPhoneForDisplay(WHATSAPP_NUMBER)}</strong></div>`;
+
+// initial load
+loadProducts();
+</script>
+
+<!--
+  README / Instructions (quick):
+  1) Create a GitHub repo and upload this index.html in the root.
+  2) Add an images/ folder and upload your component images there. Use the same filenames shown in products.json.
+  3) (Optional) Create products.json in the repo and set FETCH_FROM_GITHUB = true and update GITHUB_RAW_BASE to your raw URL (e.g. https://raw.githubusercontent.com/username/repo/main/)
+     Example products.json structure:
+     [
+       {"id":1, "name":"Arduino UNO R3", "price":"₹750", "image":"images/arduino_uno.jpg", "desc":"Atmega328P board"},
+       ...
+     ]
+  4) To host: go to repo Settings -> Pages and pick branch main (or gh-pages). Or use GitHub Desktop / CLI to push. Your site will be available at https://username.github.io/repo/
+  5) When users click "Order via WhatsApp" the site opens WhatsApp with a prefilled message to your number.
+
+  Need help customizing this (logo, payment links, categories, search, cart)? Tell me what features you want and I'll update the code.
+-->
+
+</body>
+</html>
