@@ -12,6 +12,8 @@
     <nav>
       <button onclick="showSection('electric')">Electric</button>
       <button onclick="showSection('hardware')">Hardware</button>
+      <button onclick="showSection('sanitary')">Sanitary</button>
+      <button onclick="showSection('food')">Food & Drinks</button>
     </nav>
     <input type="text" id="searchBar" placeholder="Search products..." onkeyup="searchProducts()">
   </header>
@@ -47,6 +49,48 @@
         <button onclick="addToCart('Hammer', 7)">Add to Cart</button>
       </div>
     </section>
+
+    <!-- Sanitary Section -->
+    <section id="sanitary" class="product-section" style="display:none;">
+      <h2>Sanitary</h2>
+
+      <div class="product">
+        <img src="images/Sanitary/tap.png" alt="Tap">
+        <h3>Tap</h3>
+        <p>$10</p>
+        <button onclick="addToCart('Tap', 10)">Add to Cart</button>
+      </div>
+
+      <div class="product">
+        <img src="images/Sanitary/pipe.png" alt="Pipe">
+        <h3>Pipe</h3>
+        <p>$12</p>
+        <button onclick="addToCart('Pipe', 12)">Add to Cart</button>
+      </div>
+    </section>
+
+    <!-- Food Section -->
+    <section id="food" class="product-section" style="display:none;">
+      <h2>Food & Drinks</h2>
+
+      <div class="product">
+        <img src="images/Food/cold-drink.png" alt="Cold Drink">
+        <h3>Cold Drink</h3>
+        <p><em>Contact for price</em></p>
+        <a href="https://wa.me/923001234567?text=I%20want%20to%20know%20the%20price%20of%20Cold%20Drink" target="_blank">
+          <button>Ask on WhatsApp</button>
+        </a>
+      </div>
+
+      <div class="product">
+        <img src="images/Food/lays.png" alt="Lays">
+        <h3>Lays</h3>
+        <p><em>Contact for price</em></p>
+        <a href="https://wa.me/923001234567?text=I%20want%20to%20know%20the%20price%20of%20Lays" target="_blank">
+          <button>Ask on WhatsApp</button>
+        </a>
+      </div>
+    </section>
   </main>
 
   <footer>
@@ -57,6 +101,8 @@
   <script src="script.js"></script>
 </body>
 </html>
+
+
 
 
 
