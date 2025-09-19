@@ -49,7 +49,12 @@ document.getElementById("search").addEventListener("input", (e) => {
 // Add to cart
 function addToCart(name) {
   const product = products.find(p => p.name === name);
-  cart.push(product);
+  const item = cart.find(i => i.name === name);
+  if (item) {
+    item.qty++;
+  } else {
+    cart.push({ ...product, qty: 1 });
+  }
   updateCart();
 }
 
@@ -60,18 +65,28 @@ function updateCart() {
 
   cart.forEach((item, i) => {
     const li = document.createElement("li");
-    li.innerHTML = `${item.name} - Rs.${item.price} 
-      <button onclick="removeFromCart(${i})">❌</button>`;
+    li.innerHTML = `
+      ${item.name} (Rs.${item.price})
+      <div>
+        <button onclick="changeQty(${i}, -1)">➖</button>
+        <span>${item.qty}</span>
+        <button onclick="changeQty(${i}, 1)">➕</button>
+      </div>
+      <strong>Rs.${item.price * item.qty}</strong>
+    `;
     list.appendChild(li);
   });
 
-  const total = cart.reduce((sum, item) => sum + item.price, 0);
+  const total = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
   document.getElementById("total").innerText = "Total: Rs. " + total;
 }
 
-// Remove from cart
-function removeFromCart(index) {
-  cart.splice(index, 1);
+// Change quantity
+function changeQty(index, delta) {
+  cart[index].qty += delta;
+  if (cart[index].qty <= 0) {
+    cart.splice(index, 1);
+  }
   updateCart();
 }
 
@@ -84,15 +99,16 @@ function sendWhatsApp() {
 
   let message = "Hello, I want to order:\n";
   cart.forEach(item => {
-    message += `- ${item.name} (Rs.${item.price})\n`;
+    message += `- ${item.name} x${item.qty} (Rs.${item.price} each = Rs.${item.price * item.qty})\n`;
   });
-  const total = cart.reduce((sum, item) => sum + item.price, 0);
+  const total = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
   message += `\nTotal: Rs.${total}`;
 
-  const phone = "923001234567"; // <-- replace with your WhatsApp number
+  const phone = "923430741102"; // <-- replace with your WhatsApp number
   const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
   window.open(url, "_blank");
 }
+
 
 
 
