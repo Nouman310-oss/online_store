@@ -3,28 +3,76 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>My Store</title>
+  <title>My Online Store</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <header>
-    <h1>🏪 My Store</h1>
+    <h1>Welcome to My Online Store</h1>
     <nav>
-      <button onclick="filterCategory('all')">All</button>
-      <button onclick="filterCategory('hardware')">Hardware</button>
-      <button onclick="filterCategory('electric')">Electric</button>
-      <button onclick="filterCategory('sanitary')">Sanitary</button>
-      <button onclick="filterCategory('snacks')">Snacks & Drinks</button>
+      <button onclick="showSection('hardware')">Hardware</button>
+      <button onclick="showSection('electric')">Electric</button>
+      <button onclick="showSection('sanitary')">Sanitary</button>
+      <button onclick="showSection('food')">Food & Drinks</button>
     </nav>
     <input type="text" id="searchBar" placeholder="Search products..." onkeyup="searchProducts()">
   </header>
 
-  <main id="productList"></main>
+  <main>
+    <!-- Hardware Section -->
+    <section id="hardware" class="product-section">
+      <h2>Hardware</h2>
+      <div class="product">
+        <img src="images/arduino.png" alt="Arduino">
+        <h3>Arduino</h3>
+        <p>Price: $15</p>
+        <button onclick="addToCart('Arduino', 15)">Add to Cart</button>
+      </div>
+    </section>
+
+    <!-- Electric Section -->
+    <section id="electric" class="product-section" style="display:none;">
+      <h2>Electric</h2>
+      <div class="product">
+        <img src="images/bulb.jpg" alt="Bulb">
+        <h3>Bulb</h3>
+        <p>Price: $2</p>
+        <button onclick="addToCart('Bulb', 2)">Add to Cart</button>
+      </div>
+    </section>
+
+    <!-- Sanitary Section -->
+    <section id="sanitary" class="product-section" style="display:none;">
+      <h2>Sanitary</h2>
+      <div class="product">
+        <img src="images/tap.jpg" alt="Tap">
+        <h3>Tap</h3>
+        <p>Price: $10</p>
+        <button onclick="addToCart('Tap', 10)">Add to Cart</button>
+      </div>
+    </section>
+
+    <!-- Food Section -->
+    <section id="food" class="product-section" style="display:none;">
+      <h2>Food & Drinks</h2>
+      <div class="product">
+        <img src="images/cold-drink.png" alt="Cold Drink">
+        <h3>Cold Drink</h3>
+        <p>Contact for price</p>
+        <a href="https://wa.me/923001234567?text=I%20want%20to%20know%20the%20price%20of%20Cold%20Drink" target="_blank">
+          <button>Ask on WhatsApp</button>
+        </a>
+      </div>
+    </section>
+  </main>
 
   <footer>
-    <p>Contact us on WhatsApp for prices & orders 📱</p>
+    <button onclick="showCart()">View Cart</button>
+    <div id="cart"></div>
   </footer>
 
-  <script src="script.js"></script>
+  <script src="javascript.js"></script>
 </body>
 </html>
+
+
