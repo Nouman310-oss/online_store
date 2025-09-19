@@ -1,48 +1,98 @@
+// Product database
+const products = [
+  { name: "Bulb", price: 50, category: "Electric", img: "images/Electric/bulb.png" },
+  { name: "Extension Board", price: 200, category: "Electric", img: "images/Electric/extension board.png" },
+  { name: "Hammer", price: 150, category: "Hardware", img: "images/Hardware/hammer.png" },
+  { name: "Steel Wire", price: 120, category: "Electric", img: "images/Electric/steel wire.jpg" },
+  { name: "Wash Basin", price: 800, category: "Sanitary", img: "images/Sanitary/basin.png" },
+  { name: "Cold Drink", price: 70, category: "Food", img: "images/Food/cold-drink.png" },
+  { name: "Lays Chips", price: 50, category: "Food", img: "images/Food/lays.png" }
+];
+
 let cart = [];
 
-// Show selected section
-function showSection(sectionId) {
-  let sections = document.querySelectorAll(".product-section");
-  sections.forEach(sec => sec.style.display = "none");
-  document.getElementById(sectionId).style.display = "flex";
+// Display products
+function displayProducts(list) {
+  const container = document.getElementById("product-list");
+  container.innerHTML = "";
+
+  list.forEach(p => {
+    const div = document.createElement("div");
+    div.className = "product";
+    div.innerHTML = `
+      <img src="${p.img}" alt="${p.name}">
+      <h3>${p.name}</h3>
+      <p>Rs. ${p.price}</p>
+      <button onclick="addToCart('${p.name}')">Add to Cart</button>
+    `;
+    container.appendChild(div);
+  });
 }
 
-// Add product to cart
-function addToCart(name, price) {
-  cart.push({ name, price });
-  alert(name + " added to cart!");
+displayProducts(products);
+
+// Category filter
+function showCategory(cat) {
+  if (cat === "all") {
+    displayProducts(products);
+  } else {
+    displayProducts(products.filter(p => p.category === cat));
+  }
 }
 
-// Show cart
-function showCart() {
+// Search filter
+document.getElementById("search").addEventListener("input", (e) => {
+  const term = e.target.value.toLowerCase();
+  displayProducts(products.filter(p => p.name.toLowerCase().includes(term)));
+});
+
+// Add to cart
+function addToCart(name) {
+  const product = products.find(p => p.name === name);
+  cart.push(product);
+  updateCart();
+}
+
+// Update cart & total
+function updateCart() {
+  const list = document.getElementById("cart-items");
+  list.innerHTML = "";
+
+  cart.forEach((item, i) => {
+    const li = document.createElement("li");
+    li.innerHTML = `${item.name} - Rs.${item.price} 
+      <button onclick="removeFromCart(${i})">❌</button>`;
+    list.appendChild(li);
+  });
+
+  const total = cart.reduce((sum, item) => sum + item.price, 0);
+  document.getElementById("total").innerText = "Total: Rs. " + total;
+}
+
+// Remove from cart
+function removeFromCart(index) {
+  cart.splice(index, 1);
+  updateCart();
+}
+
+// Send WhatsApp order
+function sendWhatsApp() {
   if (cart.length === 0) {
-    document.getElementById("cart").innerHTML = "Cart is empty.";
+    alert("Your cart is empty!");
     return;
   }
 
-  let html = "<h3>Your Cart</h3><ul>";
-  let total = 0;
+  let message = "Hello, I want to order:\n";
   cart.forEach(item => {
-    html += `<li>${item.name} - $${item.price}</li>`;
-    total += item.price;
+    message += `- ${item.name} (Rs.${item.price})\n`;
   });
-  html += `</ul><p><strong>Total: $${total}</strong></p>`;
-  document.getElementById("cart").innerHTML = html;
+  const total = cart.reduce((sum, item) => sum + item.price, 0);
+  message += `\nTotal: Rs.${total}`;
+
+  const phone = "923001234567"; // <-- replace with your WhatsApp number
+  const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+  window.open(url, "_blank");
 }
 
-// Search products
-function searchProducts() {
-  let input = document.getElementById("searchBar").value.toLowerCase();
-  let products = document.querySelectorAll(".product");
-
-  products.forEach(product => {
-    let name = product.querySelector("h3").innerText.toLowerCase();
-    if (name.includes(input)) {
-      product.style.display = "block";
-    } else {
-      product.style.display = "none";
-    }
-  });
-}
 
 
