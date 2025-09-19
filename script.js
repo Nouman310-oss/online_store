@@ -5,8 +5,8 @@ const products = [
   { name: "Hammer", price: 150, category: "Hardware", img: "images/Hardware/hammer.png" },
   { name: "Steel Wire", price: 120, category: "Electric", img: "images/Electric/steel wire.jpg" },
   { name: "Wash Basin", price: 800, category: "Sanitary", img: "images/Sanitary/basin.png" },
-  { name: "Cold Drink", price: 70, category: "Food", img: "images/Food/cold-drink.png" },
-  { name: "Lays Chips", price: 50, category: "Food", img: "images/Food/lays.png" }
+  { name: "Cold Drink", price: 70, category: "Food", img: "images/snacks/coca cola.png" },
+  { name: "Lays Chips", price: 50, category: "Food", img: "images/snacks/lays.jpg" }
 ];
 
 let cart = [];
@@ -108,6 +108,7 @@ function sendWhatsApp() {
   const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
   window.open(url, "_blank");
 }
+
 
 
 
